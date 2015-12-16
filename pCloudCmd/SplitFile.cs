@@ -40,7 +40,7 @@ namespace PersonalCloud.Command
         private readonly int bufferSize;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SplitFile"/> class.
+        /// 初始化 <see cref="SplitFile"/> 类的新实例。
         /// </summary>
         /// <param name="path">待处理文件路径。</param>
         /// <param name="size">拆分成的大小，单位：字节。</param>
@@ -76,18 +76,18 @@ namespace PersonalCloud.Command
             for (var i = 0; i < count && !CancellationToken.IsCancellationRequested; ++i)
             {
                 var offset = i * this.size;
-                var filePath = this.path + "." + (i + 1).ToString(format);
-                files.Add(filePath);
-                tasks[i] = Task.Run(() => this.Process(offset, filePath), CancellationToken);
+                var outputFilePath = this.path + "." + (i + 1).ToString(format);
+                files.Add(outputFilePath);
+                tasks[i] = Task.Run(() => this.Process(offset, outputFilePath), CancellationToken);
             }
 
             Task.WaitAll(tasks, CancellationToken);
 
             if (CancellationToken.IsCancellationRequested)
             {
-                foreach (var filePath in files.Where(File.Exists))
+                foreach (var outputFilePath in files.Where(File.Exists))
                 {
-                    File.Delete(filePath);
+                    File.Delete(outputFilePath);
                 }
             }
         }
@@ -96,14 +96,14 @@ namespace PersonalCloud.Command
         /// 处理某段文件区域。
         /// </summary>
         /// <param name="offset">读取文件的分段偏移。</param>
-        /// <param name="filePath">写入的文件路径。</param>
-        private void Process(long offset, string filePath)
+        /// <param name="outputFilePath">写入的文件路径。</param>
+        private void Process(long offset, string outputFilePath)
         {
             using (var reader = File.Open(this.path, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                reader.Seek(offset, SeekOrigin.Begin);
-                using (var writer = File.Open(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (var writer = File.Open(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
+                    reader.Seek(offset, SeekOrigin.Begin);
                     var buffer = new byte[Math.Min(this.bufferSize, this.size)];
                     var blocks = this.size / buffer.Length;
                     for (var i = 0; i < blocks && !CancellationToken.IsCancellationRequested; ++i)

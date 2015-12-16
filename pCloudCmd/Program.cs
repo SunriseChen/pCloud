@@ -36,12 +36,12 @@ namespace PersonalCloud.Command
             else if (string.Compare(args[0], "j", StringComparison.InvariantCultureIgnoreCase) == 0)
             {
                 // 合并文件。
-                Console.WriteLine("Join");
+                JoinFile(args);
             }
             else if (string.Compare(args[0], "c", StringComparison.InvariantCultureIgnoreCase) == 0)
             {
                 // 验证文件。
-                Console.WriteLine("Check");
+                CheckFile(args);
             }
             else if (string.Compare(args[0], "u", StringComparison.InvariantCultureIgnoreCase) == 0)
             {
@@ -118,13 +118,44 @@ namespace PersonalCloud.Command
         private static void SplitFile(string[] args)
         {
             var path = args[1];
-            var size = GetValue(args[2]);
-
             if (File.Exists(path))
             {
+                var size = GetValue(args[2]);
                 var split = new SplitFile(path, size);
                 split.Process();
                 Console.WriteLine("Split '{0}' file completed.", path);
+            }
+            else
+            {
+                Console.WriteLine("File '{0}' not found.", path);
+            }
+        }
+
+        /// <summary>
+        /// 合并文件。
+        /// </summary>
+        /// <param name="args">命令行参数。</param>
+        private static void JoinFile(string[] args)
+        {
+            var path = args[1];
+            var join = new JoinFile(path);
+            join.Process();
+            Console.WriteLine("Join '{0}' file completed.", path);
+        }
+
+        /// <summary>
+        /// 合并文件。
+        /// </summary>
+        /// <param name="args">命令行参数。</param>
+        private static void CheckFile(string[] args)
+        {
+            var path = args[1];
+            if (File.Exists(path))
+            {
+                var size = GetValue(args[2]);
+                var split = new SplitFile(path, size);
+                split.Process();
+                Console.WriteLine("Check '{0}' file completed.", path);
             }
             else
             {
